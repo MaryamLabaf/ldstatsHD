@@ -1,0 +1,72 @@
+export(cor2mean)
+export(cor2mean.adj) 
+export(pcorSimulator)
+export(pcor2jointGraph)
+export(pcorSimulatorJoint)
+export(wfgl)
+export(wfrl)
+export(eqCorTestByRows)
+export(eqCorrMatTest)
+export(estradaIndex)
+export(agnesCoef)
+export(agnesLambdaSelection)
+export(graphCorr)
+export(graphDist)
+export(harmMeanDist)
+export(lambdaSelection)
+export(vulLambdaSelection)
+export(aicAndbicLambdaSelection)
+export(amseLambdaSelection)
+export(pcLambdaSelection)
+
+S3method(plot, pcorSim)
+S3method(plot, pcorSimJoint)
+S3method(plot, wfgl)
+S3method(plot, wfrl)
+S3method(plot, eqCorTestByRows)
+S3method(plot, lambdaSelection)
+
+S3method(print, pcorSim)
+S3method(print, pcorSimJoint)
+S3method(print, wfgl)
+S3method(print, wfrl)
+S3method(print, eqCorTestByRows)
+S3method(print, eqCorrMatTest)
+S3method(print, lambdaSelection)
+
+S3method(summary, pcorSim)
+S3method(summary, pcorSimJoint)
+S3method(summary, wfgl)
+S3method(summary, wfrl)
+S3method(summary, eqCorTestByRows)
+S3method(summary, eqCorrMatTest)
+S3method(summary, lambdaSelection)
+
+import(igraph)
+import(huge)
+
+importFrom(evd, pgev, fgev)
+importFrom(fExtremes, pgpd)
+importFrom(corpcor, pseudoinverse)
+importFrom(Matrix, bdiag,forceSymmetric, Matrix)
+importFrom(MASS, mvrnorm, fitdistr)
+importFrom(robustbase, s_Qn)
+importFrom(VGAM, zeta)
+importFrom(cluster, agnes)
+importFrom(RBGL, johnson.all.pairs.sp)
+importFrom(camel, camel.tiger)
+
+importFrom("grDevices", "devAskNewPage")
+importFrom("graphics", "abline", "lines", "par", "plot", "points")
+importFrom("stats", "as.dist", "cor", "cov", "cov2cor", "lm", "pgamma",
+             "pnorm", "qgamma", "qnorm", "quantile", "rbeta", "rbinom",
+             "rmultinom", "rnorm", "runif", "sd", "var")
+importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+
+
+
+
+
+
+
+
