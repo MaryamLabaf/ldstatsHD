@@ -12,8 +12,7 @@
 
 \usage{
 eqCorTestByRows(D1, D2 = NULL, testStatistic = c("AS", "max"), nite = 200, 
-                paired = FALSE, exact = TRUE, subMatComp = FALSE, iniP = 1, 
-                finP = NULL, conf.level = 0.95)
+                paired = FALSE, exact = TRUE, whichRows = NULL, conf.level = 0.95, ...)
 
 }
 
@@ -40,21 +39,15 @@ eqCorTestByRows(D1, D2 = NULL, testStatistic = c("AS", "max"), nite = 200,
       in the two conditions in the samples exchanging process. If \code{FALSE}, permutations are made exchanging 
       matched observations from the two datasets randomly with probability equal to 0.5.
 }
-\item{subMatComp}{
-	 used to reduce computational time when using the test in very high dimensional data. If \code{TRUE} correlation sub-matrices are 
-	 used, if \code{FALSE}, whole correlation matrices are computed.
-}
-\item{iniP}{
-      only for \code{subMatComp = TRUE} and \code{D2 != NULL}. First row to be tested.
-}
-
-\item{finP}{
-      only for \code{subMatComp = TRUE} and \code{D2 != NULL}. Last row to be tested.
+\item{whichRows}{
+	 vector with the rows in the correlation matrix that are tested. If \code{NULL}, all rows are tested.
 }
 \item{conf.level}{
 	confidence level of the interval.
 }
-
+ \item{\dots}{
+    arguments passed to or from other methods to the low level.
+    }
 }
 \details{
 	This test uses a sum of squares based test statistic as given by the adjusted squared correlation \code{\link{cor2mean.adj}} 
@@ -96,8 +89,8 @@ EX2 <- pcorSimulatorJoint(nobs = 200, nclusters = 3, nnodesxcluster = c(60,40,50
 #### eq corr by rows
 ## not run
 #test1 <- eqCorTestByRows(EX2$D1, EX2$D2, testStatistic = c("AS", "max"), 
-#                         nite = 200, paired = TRUE, exact = TRUE, subMatComp = FALSE, 
-#                         iniP = 1, finP = 40, conf.level = 0.95)
+#                         nite = 200, paired = TRUE, exact = TRUE, 
+#                         whichRows = c(1:40), conf.level = 0.95)
 #print(test1)
 
 #### zero corr by rows

@@ -70,6 +70,7 @@ pcorSimulatorTwo <- function(nobs, nclusters, nnodesxcluster, pattern="hubs", di
   if(pdiff > 0 && (diffType == "random" | diffType == "mixed")){
     CORR        <- cov2cor(solve(PREC.MAT.0))
     PREC.MAT.0  <- pseudoinverse(CORR)
+    set.seed(seed[1]*3)
     id <- runif(P,0,1) < pdiff
     CORR[id, !id] <- 0
     CORR[!id, id] <- 0

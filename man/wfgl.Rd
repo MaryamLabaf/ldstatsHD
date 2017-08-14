@@ -15,10 +15,9 @@
 
 wfgl(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE, 
      sigmaEstimate = "CRmad", pairedEst = "Reg-based-sim", maxiter = 30, 
-     tol = 1e-05, nsubset = 10000, weights = c(1,1), rho=1, rho.increment = 1, 
+     tol = 1e-05, nsubset = 10000, weights = c(1,1), rho = 1, rho.increment = 1, 
      triangleCorrection = TRUE, alphaTri = 0.01, temporalFolders = FALSE, 
-     notOnlyLambda2 = TRUE)
-
+     notOnlyLambda2 = TRUE, roundDec = 16, burn = 0, lambda1B = NULL, lambda2B = NULL)
 }
 
 \arguments{
@@ -83,6 +82,20 @@ wfgl(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
 }
 \item{notOnlyLambda2}{
      if \code{FALSE} only lambda2 is found automatically.
+}
+\item{roundDec}{
+     number of decimals to be stored, if low it reduces de memory space used.
+}
+
+\item{burn}{
+     initial number of iterations which consider the original interpretation of lambda1 (given by \code{lambda1B}) and of lambda2 (given by \code{lambda1B}) 
+     even when \code{automLambdas = TRUE}. 
+}
+\item{lambda1B}{
+	lambda1 interpreted as when \code{automLambdas = FALSE} (see details). 
+}
+\item{lambda2B}{
+	lambda2 interpreted as when \code{automLambdas = FALSE} (see details). 
 }
 
 

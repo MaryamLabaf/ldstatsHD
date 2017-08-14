@@ -17,7 +17,7 @@
 eqCorrMatTest(D1, D2 = NULL, testStatistic = c("AS", "max", "exc"), 
               testNullDist = c("asyIndep","asyDep", "np"), nite= 500, 
               paired = FALSE, threshold = 2.3, excAdj = TRUE, exact = FALSE,
-              conf.level = 0.95, ...)
+              conf.level = 0.95, saddlePoint = FALSE, MINint =2, MAXint=100, ...)
                 
 }
 
@@ -61,6 +61,15 @@ eqCorrMatTest(D1, D2 = NULL, testStatistic = c("AS", "max", "exc"),
 }
 \item{conf.level}{
 	confidence level of the interval.
+}
+\item{saddlePoint}{
+	saddle-point approximation is used to find the p-value for exceedances-based test under asymptotic independence null distribution (only for \code{excAdj = FALSE}). 
+}
+\item{MINint}{
+	minimum expected number of exceedances for saddle point approximation. 
+}
+\item{MAXint}{
+	maximum expected number of exceedances for saddle point approximation. 
 }
 \item{\dots}{
     arguments passed to or from other methods to the low level.

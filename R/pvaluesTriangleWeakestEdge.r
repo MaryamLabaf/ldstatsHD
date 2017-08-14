@@ -14,17 +14,28 @@ pvaluesTriangleWeakestEdge <- function(A1, A2, alpha=0.01, D1, D2, equalBetweenC
 
           TRI1r           <- findTriangles(A1)
           TRI2r           <- findTriangles(A2)
-
+		 print(dim(TRI1r))
+		 print(dim(TRI2r))
+		 
           ## pvalues first matrix
           cor2EX <- FALSE
           if(class(TRI1r)=="matrix"){
              if(dim(TRI1r)[1]>0){
                 cor2 <- apply(as.matrix(1:dim(TRI1r)[1]),1,function(PL){
+                  print(PL)
                   cc1 <- TRI1r[PL,]
-                  aa <- abs(cov2cor(solve(cov2cor(cor(D1[,cc1])))))
-                  aa2 <- which.min(lowerTri(aa))
-                  aa  <- min(aa)
-                  c(c(cc1[ind1[aa2]],cc1[ind2[aa2]]),pnorm(ztransf(aa)*sqrt(N-5)))
+                  aa <- try(abs(cov2cor(solve(cov2cor(cor(D1[,cc1]))))))
+                  if(class(aa)!="try-error"){
+                   aa2 <- which.min(lowerTri(aa))
+                   aa  <- min(aa)
+                   return(c(c(cc1[ind1[aa2]],cc1[ind2[aa2]]),pnorm(ztransf(aa)*sqrt(N-5))))
+   				  }
+   				  else
+   				  {
+   				   aa2 <- 1
+                   aa  <- 1
+                   return(c(c(cc1[ind1[aa2]],cc1[ind2[aa2]]),0))
+   				  } 
             })
             cor2EX <- TRUE
            }
@@ -34,11 +45,20 @@ pvaluesTriangleWeakestEdge <- function(A1, A2, alpha=0.01, D1, D2, equalBetweenC
           if(class(TRI2r)=="matrix"){
              if(dim(TRI2r)[1]>0){
                 cor3 <- apply(as.matrix(1:dim(TRI2r)[1]),1,function(PL){
+                  print(PL)
                   cc1 <- TRI2r[PL,]
-                  aa <- abs(cov2cor(solve(cov2cor(cor(D2[,cc1])))))
-                  aa2 <- which.min(lowerTri(aa))
-                  aa  <- min(aa)
-                  c(c(cc1[ind1[aa2]],cc1[ind2[aa2]]),pnorm(ztransf(aa)*sqrt(N-5)))
+                  aa <- try(abs(cov2cor(solve(cov2cor(cor(D2[,cc1]))))))
+                  if(class(aa)!="try-error"){
+                   aa2 <- which.min(lowerTri(aa))
+                   aa  <- min(aa)
+                   return(c(c(cc1[ind1[aa2]],cc1[ind2[aa2]]),pnorm(ztransf(aa)*sqrt(N-5))))
+   				  }			  
+                  else
+   				  {
+   				   aa2 <- 1
+                   aa  <- 1
+                   return(c(c(cc1[ind1[aa2]],cc1[ind2[aa2]]),0))
+   				  }
             })
             cor3EX <- TRUE
            }

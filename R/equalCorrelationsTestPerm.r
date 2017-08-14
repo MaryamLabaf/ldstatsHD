@@ -21,60 +21,46 @@ equalCorrelationsTestPerm  <- function(Test, theta, TestsP, EX = 2.3, sumSquares
   weight1 	<- ifelse(excAdj, 1, 0)
   if(length(EX)>1){
     PVALandCI  <- t(apply(as.matrix(EX), 1, function(DA){
-      maxsR2   	<- apply(abs(TestsP), 1, function(x) squareWeight(x, DA, weight1))
-	  testEXC 	<- squareWeight(Test, DA, weight1)
-  	  Res1   	<- mean(testEXC < maxsR2)
+	  maxsR2   	<- apply(abs(TestsP), 1, function(x) squareWeight(abs(x), DA, weight1))
+	  testEXC 	<- squareWeight(abs(Test), DA, weight1)
+	  Res1      <- mean(testEXC < maxsR2)
   	  Res2		<- quantile( testEXC - maxsR2, c(1-conf.level, 1-0.0001)) 
-	  c(Res1, Res2)
+	  ve		<- var(maxsR2) 
+	  c(Res1, Res2, mean(testEXC - maxsR2))
 	}))
+
+	pvalEXC <- PVALandCI[,1]
+    saf  <- t(apply(as.matrix(EX), 1, function(DA){
+	  maxsR2   	<- apply(abs(TestsP), 1, function(x) squareWeight(abs(x), DA, weight1))
+	  testEXC 	<- squareWeight(abs(Test), DA, weight1)
+	  c((maxsR2-mean(maxsR2))/sd(maxsR2),(testEXC-mean(maxsR2))/sd(maxsR2))
+	}))
+	pvalEXC <- c(1-mean(apply(saf[,1:dim(TestsP)[1]],2,max) <= max(saf[,dim(TestsP)[1]+1])),pvalEXC)
+
+	ciExc   <- 1#PVALandCI[,c(2,3)]
+	TESTex  <- saf[,dim(TestsP)[1]+1]#PVALandCI[,4]
+
   }
+  
   else
   {
 	  DA 		<- EX
 	  maxsR2   	<- apply(abs(TestsP), 1, function(x) squareWeight(abs(x), DA, weight1))
 	  testEXC 	<- squareWeight(abs(Test), DA, weight1)
 	  pvalEXC   <- mean(testEXC < maxsR2)
-	  ciExc		<- quantile(testEXC - maxsR2, c(1-conf.level, 1-0.0001)) 
+	  ciExc		<- t(as.matrix(quantile(testEXC - maxsR2, c(1-conf.level, 1-0.0001)) ))
+
+#	  maxsR2   	<- apply(abs(TestsP), 1, function(x) squareWeight(abs(x), DA, 1-weight1))
+#	  testEXC 	<- squareWeight(abs(Test), DA,  1-weight1)
+#	  pval2   <- mean(testEXC < maxsR2)
+	  TESTex  <-  mean(testEXC - maxsR2)
+
   }
   
   obj     <- list()
   obj$AS  <- list(testAS = mean(TestSS - SSs), pvalue = pvalSS, ci = ciSS)
   obj$MAX <- list(testMax = mean(TestMax - maxs), pvalue = pvalMax, ci = ciMax)
-  obj$EXC <- list(testExc = mean(testEXC - maxsR2), pvalue = pvalEXC, ci = ciExc)
+  obj$EXC <- list(testExc = TESTex, pvalue = pvalEXC, ci = ciExc)#, pvalue2 = pval2)
   return(obj)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-#-log(1-pgpd2(abs(a1)[abs(a1)>EX]-EX,P1$mle[2],0,P1$mle[1]))
-#(Test^2/2 +log(abs(Test)))[abs(Test)>DA] -DA
-
-#k1 <- -log(1-pgpd2(abs(a1)[abs(a1)>EX]-EX,P1$mle[2],0,P1$mle[1]))
-#k2 <- -log(2-2*pnorm((abs(a1)[abs(a1)>EX])))
-#plot(abs(a1)[abs(a1)>EX],k1/k2)
-
-#P1        <- gpd.fit(abs(rnorm(100000000)),threshold=EX)
-#r1<-rnorm(1000000)
-#a1 <- 1-(pgpd2(abs(r1)[abs(r1)>EX]-EX,P1$mle[2],0,P1$mle[1]))
-#a2 <-  (2-2*pnorm(abs(r1)[abs(r1)>EX])) /(2-2*pnorm(EX))
-#a3<-(r1^2+log(abs(r1)))[abs(r1)>EX]
-#a2 <-  (2-2*pnorm(abs(r1)[abs(r1)>EX]))
-# plot(abs(r1)[abs(r1)>EX],-log(a2)/a3)
- 
-#k1 <- -log(1-)
-#k2 <- -log(1-1*pnorm((abs(r1)[abs(r1)>EX])))
-#k3 <- (r1^2)[abs(r1)>EX]
-#plot(abs(r1)[abs(r1)>EX],k2/k3)
-
-#,P1$mle[2],0,P1$mle[1]))
 

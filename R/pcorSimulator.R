@@ -22,10 +22,12 @@ pcorSimulator  <- function(nobs, nclusters, nnodesxcluster, pattern = "powerLaw"
                          seed = cPS$seed[i], plus = cPS$plus, prob = cPS$prob[i]))
 
   EdgesToChange1 	<- do.call(rbind, lapply(MOD,function(x) x$edgesToChange))         
-  hubs          	<- as.numeric(names(table(EdgesToChange1)))[which(table(EdgesToChange1) 
-  										>= max(degree.hubs))]
   omega       		<- as.matrix(do.call(bdiag, lapply(MOD,function(x) x$omega)))
-  
+  if(pattern=="hubs") 
+   hubs 				<- do.call(c, lapply(MOD,function(x) x$hubs))         
+  else 
+   hubs <- NULL
+
   ## Between clusters connections 
   if(cPS$perturb.clust > 0 & cPS$nclusters > 1){
     omega  <- connBtwClusters(omega, perturb.clust = cPS$perturb.clust)
@@ -33,15 +35,16 @@ pcorSimulator  <- function(nobs, nclusters, nnodesxcluster, pattern = "powerLaw"
   
   
   ## Finding covariance matrix and path
-  rm(list = ".Random.seed", envir = globalenv()) 
   covMat 		<- pseudoinverse(omega)
   
   path        	<- ((omega)!=0)*1
   diag(path)  	<- 0
 
   ## Generating observations and return
+  set.seed(seed[1]*6)
   y   <- mvrnorm(nobs, cPS$mu, covMat)  
 
+  rm(list = ".Random.seed", envir = globalenv()) 
   obj <- list(y = y, hubs = hubs, edgesInGraph = EdgesToChange1, omega = omega, 
               covMat = covMat, path = path, pattern = cPS$pattern)
   class(obj) <- "pcorSim"            

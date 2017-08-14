@@ -6,6 +6,7 @@ equalCorrelationsTestMax <- function(Test, theta = NULL, TestsP = NULL, dependen
 {
       pgev2 <- evd::pgev
       qgev2 <- evd::qgev
+      
       ## Test statistic
       P2    <- length(Test)
       Tm    <- max(abs(Test)) 

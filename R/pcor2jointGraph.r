@@ -11,6 +11,9 @@ pcor2jointGraph <- function(M1, M2, minn=0, col=c("blue","red","green"), vertex.
   AJ2 <- MAJ%*%MAJ
   wh1 <- which(apply(Aj,1,sum)>0&apply(AJ2,1,sum)>minn)
   Aj2 <- Aj[wh1,wh1]
+  wh11 <- which(apply(Aj2,1,sum)>0)
+  Aj2 <- Aj2[wh11,wh11]
+  
   gr <- graph.adjacency(Aj2,mode="undirected")
   NAMES <- get.data.frame(gr, what="edg")
   INwhich <- apply(NAMES,1,function(x){

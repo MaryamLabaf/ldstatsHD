@@ -49,6 +49,7 @@ pcorSimulatorJoint  <- function(nobs, nclusters, nnodesxcluster, pattern = "hubs
         else
         { 
 			## paired structure 
+			set.seed(seed[length(seed)]*2)
 			if(cJPS$diagCCtype == "dicot") 
 			  delta  <- sample(c(rep(0,P/2),rep(diagNZ.strength,P/2)))
 			if(cJPS$diagCCtype == "beta13") 
@@ -157,8 +158,10 @@ pcorSimulatorJoint  <- function(nobs, nclusters, nnodesxcluster, pattern = "hubs
 		    }
 		}
 
+
         COVj <- cov2cor(solve(jointPCOR0))
-		DAT  <- try(mvrnorm(N,rep(0,P*2),COVj))
+        set.seed(seed[length(seed)]*6)
+        DAT  <- try(mvrnorm(N,rep(0,P*2),COVj))
         D1 	 <- (DAT[,1:P])
         D2 	 <- (DAT[,1:P+P])
 

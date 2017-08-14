@@ -1,6 +1,7 @@
 controlwfgl <- function(D1, D2, lambda1, lambda2, paired, automLambdas, 
 	 			 sigmaEstimate, pairedEst, maxiter, tol, nsubset, weights,
-	 			 rho, rho.increment, triangleCorrection, alphaTri, temporalFolders)
+	 			 rho, rho.increment, triangleCorrection, alphaTri, temporalFolders,
+	 			 burn)
 {
   ## dimensions
   if(dim(D1)[2] != dim(D2)[2])
@@ -72,6 +73,9 @@ controlwfgl <- function(D1, D2, lambda1, lambda2, paired, automLambdas,
    if( alphaTri < 0 | alphaTri > 0.5 ) 
      stop("alphaTri is not well defined for triangleCorrection = TRUE. It must be between 0 and 0.5")
   }  	
-
+  ## maxite, burn
+  if(burn >maxiter)
+     stop("maxiter must be larger than burn")
+  	
   return(c(sigmaEstimate, pairedEst))
 }

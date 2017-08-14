@@ -1,5 +1,5 @@
  
-aicAndbicLambdaSelection <- function(obj, y,  criterion = c("AIC", "BIC"))
+aicAndbicLambdaSelection <- function(obj, y,  criterion = c("AIC", "BIC", "eBIC"),phi=1)
 {
         ## checks
         if(class(obj) != "huge" & class(obj) != "tiger")
@@ -11,27 +11,28 @@ aicAndbicLambdaSelection <- function(obj, y,  criterion = c("AIC", "BIC"))
 	    if(is.null(obj$icov) | is.null(obj$cov))
          stop("obj$icov and obj$cov have to be defined for aicAndbicLambdaSelection")
       
-        pcriterion <- c("AIC", "BIC")
+        pcriterion <- c("AIC", "BIC", "eBIC")
         criterion <- pcriterion[pmatch(criterion[1], pcriterion)]
-		if (is.na(criterion)) stop("criterion is not well define. It must be selected from \"AIC\" or \"BIC\" ")
+		if (is.na(criterion)) stop("criterion is not well define. It must be selected from \"AIC\" or \"BIC\" or  \"eBIC\" ")
 
         ## initialization
         LAMBDA  <- obj$lambda
         N       <- dim(y)[1]
         pb      <- txtProgressBar(min = 0, max = length(LAMBDA), style = 3)
-        
+        M		<- dim(y)[2]*(dim(y)[2]-1)
         ## AIC and BIC
         AICs <-apply(as.matrix(1:length(LAMBDA)), 1, function(k){
           setTxtProgressBar(pb, k)
           aa 	<- (y)%*%as.matrix(obj$icov[[k]])
-          AA2 	<-  2*N*(0.5 * log(det(as.matrix(obj$cov[[k]])))) + sum(aa*y)
+          AA2 	<-  2*N*(0.5 * log(det(as.matrix(obj$cov[[k]])))) - 2*sum(aa*y)
           BB 	<- sum(unlist(lapply(AA2,mean)))
           AL 	<- sum(obj$path[[k]]) 
-          c(AL + BB, AL/2*log(N) + BB)
+          c(AL + BB, AL/2*log(N) + BB, AL/2*log(N) + BB + 2*phi*lchoose(M,sum(obj$path[[k]])))
         })
         
-        lambdaAIC <- LAMBDA[which.min(AICs[1,])]
-        lambdaBIC <- LAMBDA[which.min(AICs[2,])]
+        lambdaAIC  <- LAMBDA[which.min(AICs[1,])]
+        lambdaBIC  <- LAMBDA[which.min(AICs[2,])]
+        lambdaeBIC <- LAMBDA[which.min(AICs[3,])]
         close(pb)
 
         if(length(criterion) == 2)
@@ -55,6 +56,12 @@ aicAndbicLambdaSelection <- function(obj, y,  criterion = c("AIC", "BIC"))
            ret.list    	<- list(opt.lambda = c(lambdaBIC), 
                             crit.coef = AICs[2,],
                             criterion = "BIC")
+		 }
+		 if(criterion == "eBIC")
+         {
+           ret.list    	<- list(opt.lambda = c(lambdaeBIC), 
+                            crit.coef = AICs[3,],
+                            criterion = "eBIC")
 		 }
 		 attr(ret.list, "bestpath") <- obj$path[[ which(obj$lambda == ret.list[[1]][1]) ]]
         }

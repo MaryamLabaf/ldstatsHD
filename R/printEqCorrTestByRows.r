@@ -16,9 +16,13 @@ print.eqCorTestByRows <- function(x, ...){
   
   
   if(any(x$testStatistic == "AS"))
-    cat(gettextf("number of significant rows for Tas: %s at %s conf.level, expected %s", sum(x$ciAS[,1]>0), round(x$conf.level,3), round(dim(x$ciAS)[1]*(1-x$conf.level),2)),"\n")  
-  
+  {
+    if(length(x$AStest)>1)
+     cat(gettextf("number of significant rows for Tas: %s at %s conf.level, expected %s", sum(x$ciAS[,1]>0), round(x$conf.level,3), round(dim(x$ciAS)[1]*(1-x$conf.level),2)),"\n")  
+  }
   if(any(x$testStatistic == "max"))
-    cat(gettextf("number of significant rows for Tm: %s at %s conf.level, expected %s", sum(x$ciMax[,1]>0), round(x$conf.level,3), round(dim(x$ciMax)[1]*(1-x$conf.level),2)),"\n\n")  
-
+  {
+    if(length(x$Maxtest)>1)
+     cat(gettextf("number of significant rows for Tm: %s at %s conf.level, expected %s", sum(x$ciMax[,1]>0), round(x$conf.level,3), round(dim(x$ciMax)[1]*(1-x$conf.level),2)),"\n\n")  
+  }	
 }

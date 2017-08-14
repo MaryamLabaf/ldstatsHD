@@ -3,7 +3,7 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
 	 			 sigmaEstimate = "CRmad", pairedEst = "Reg-based-sim", maxiter = 30, 
 	 			 tol = 1e-05, nsubset = 10000, weights = c(1,1), rho = 1, rho.increment = 1, 
 	 			 triangleCorrection = TRUE, alphaTri = 0.01, temporalFolders = FALSE, 
-	 			 notOnlyLambda2 = TRUE)
+	 			 notOnlyLambda2 = TRUE, roundDec = 16, burn = 0, lambda1B = NULL, lambda2B = NULL)		
 {    
     
     ## checks
@@ -11,7 +11,7 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
     			automLambdas = automLambdas, sigmaEstimate = sigmaEstimate, pairedEst = pairedEst, 
     			maxiter = maxiter, tol = tol, nsubset = nsubset, weights = weights, rho = rho,
 	 			rho.increment = rho.increment, triangleCorrection = triangleCorrection, 
-	 			alphaTri = alphaTri, temporalFolders = temporalFolders)
+	 			alphaTri = alphaTri, temporalFolders = temporalFolders, burn = burn)		
 	if(automLambdas) sigmaEstimate 	<- cj[1]
 	if(paired) 		 pairedEst 		<- cj[2]
 	 			 
@@ -21,8 +21,8 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
     D2            <- scale(D2)
     N             <- dim(D1)[1]
     S			  <- list()
-    S[[1]]        <- cov(D1)
-    S[[2]]        <- cov(D2)
+    S[[1]]        <- round(cov(D1)*(N - 1)/N,roundDec)
+    S[[2]]        <- round(cov(D2)*(N - 1)/N,roundDec)
  	theta0        <- list()
     P             <- dim(S[[1]])[2]
     K             <- 2
@@ -32,14 +32,14 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
 	for(k in 1:K){
 		aux 		<- S[[k]]
 		edecomp     <- eigen(aux)
-		rm(aux); gc()
+		rm(aux); 
 		D           <- edecomp$values
 		V           <- edecomp$vectors
-		rm(edecomp); gc()
+		rm(edecomp); 
 		DK          <- n[k]/(2 * rho) * (-D + sqrt(D^2 + 4 * rho/n[k]))
 		AA          <- t(apply(V,1,function(x) x*DK))
 		theta0[[k]] <- AA %*% t(V)
-		rm(V); rm(DK); rm(AA); gc()
+		rm(V); rm(DK); rm(AA); 
     }
 	## corEst2
 	if(paired){
@@ -50,24 +50,25 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
 		pcor2 		<- cov2cor(theta0[[2]])
 		if(pairedEst == "Reg-based-sim")
 		{
-			corEst2 	<- (cors%*%t(cors)) * (1/(sqrt(1 - pcor1^2) * sqrt(1 - pcor2^2)))
+			corEst2 	<- (cors%*%t(cors)) * (1/((1 - pcor1^2) * (1 - pcor2^2)))
 			diag(corEst2) <- cors^2
 		}
 		if(pairedEst == "Reg-based")
 		{
 			W1 			<- array(rep(cors,P), dim = c(P, P))
 			corEst2 	<- (cors%*%t(cors) + (pcor1 * pcor2 * (W1^2 + t(W1)^2) / 2)) * 
-						   (1/(sqrt(1 - pcor1^2) * sqrt(1 - pcor2^2)))
+						   (1/((1 - pcor1^2) * (1 - pcor2^2)))
 			diag(corEst2) <- cors^2
 			rm(W1)
 		}
-		rm(cors,c12,c22); gc()
+		corEst2 <- pmin(corEst2,0.95)
+		rm(cors,c12,c22); 
 	}
-	else  corEst2 <- array(.5, dim=c(P,P))
+	else  corEst2 <- array(0.5, dim=c(P,P))
 
 	if(temporalFolders){
  	  save(theta0, file = "theta0temp.Rdata")
-	  rm(theta0); gc()
+	  rm(theta0); 
 	}
 	
 	## ind12
@@ -79,16 +80,13 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
   	 for(lamb1i in 1:lengthPath){
   	 	if(temporalFolders)    load("theta0temp.Rdata")
   	 	
-    	pal           <- max(10^5,P*(P-1)/2)	   
-        if(automLambdas & notOnlyLambda2& pal*lambda1[lamb1i]*lambda2>5)   
-          lambda2 <- findingLambda2(pal, lam1=lambda1[lamb1i], lam2=lambda2, tol = 0.001, maxiter = 30) #internal use only
-
        objaux[[lamb1i]] <- wfglaux(D1 = D1, D2 = D2, lambda1 = lambda1[lamb1i], lambda2 = lambda2, paired = paired, 
 								 automLambdas = automLambdas, sigmaEstimate = sigmaEstimate, pairedEst = pairedEst,
 								 maxiter = maxiter, tol = tol, nsubset = nsubset, weights = weights, rho = rho, 
 								 rho.increment = rho.increment, triangleCorrection = triangleCorrection, 
 								 alphaTri = alphaTri, temporalFolders = temporalFolders, theta0 = theta0, 
-								 corEst2 = corEst2, ind12 = ind12, S = S, notOnlyLambda2 = notOnlyLambda2)	
+								 corEst2 = corEst2, ind12 = ind12, S = S, notOnlyLambda2 = notOnlyLambda2, burn=burn,
+	 							 lambda1B = lambda1B, lambda2B = lambda2B)	
 	 }
 	 obj 	    <- list()
 	 obj$path   <- lapply(objaux, function(x) x$path)
@@ -100,20 +98,19 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
 	 obj$triangles1 <- lapply(objaux, function(x) x$triangles1)
 	 obj$triangles2 <- lapply(objaux, function(x) x$triangles2)
 	 obj$corEst2 	<- corEst2	
+	 obj$automLambdas	<- automLambdas
 	 rm(objaux)
 
 	}
 	else{
   	 	if(temporalFolders)    load("theta0temp.Rdata")
-		pal           <- max(10^5,P*(P-1)/2)	   
-        if(automLambdas & notOnlyLambda2& pal*lambda1*lambda2>5)   
-          lambda2 <- findingLambda2(pal, lam1=lambda1, lam2=lambda2, tol = 0.001, maxiter = 30) #internal use only
 		obj <- wfglaux(D1 = D1, D2 = D2, lambda1 = lambda1, lambda2 = lambda2, paired = paired, 
 					   automLambdas = automLambdas, sigmaEstimate = sigmaEstimate, pairedEst = pairedEst,
 					   maxiter = maxiter, tol = tol, nsubset = nsubset, weights = weights, rho = rho, 
 					   rho.increment = rho.increment, triangleCorrection = triangleCorrection, 
 					   alphaTri = alphaTri, temporalFolders = temporalFolders, theta0 = theta0, 
- 					   corEst2 = corEst2, ind12 = ind12, S = S, notOnlyLambda2 = notOnlyLambda2)	
+ 					   corEst2 = corEst2, ind12 = ind12, S = S, notOnlyLambda2 = notOnlyLambda2, burn=burn,
+ 					   lambda1B = lambda1B, lambda2B = lambda2B)	
 	}
 	
 	obj$paired  		<- paired
@@ -121,6 +118,7 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
  	obj$pairedEst  		<- pairedEst
     obj$lambda1  		<- lambda1
 	obj$lambda2  		<- lambda2
+    obj$automLambdas	<- automLambdas
 
     class(obj) 			<- "wfgl"
     
@@ -135,22 +133,23 @@ wfgl <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE,
     return(obj)
 }
 
-
+             
 #######
 wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE, 
 	 			 sigmaEstimate = "CRmad", pairedEst = "Reg-based-sim", maxiter = 30, 
 	 			 tol = 1e-05, nsubset = 10000, weights = c(1,1), rho = 1, rho.increment = 1, 
 	 			 triangleCorrection = TRUE, alphaTri = 0.01, temporalFolders = FALSE, 
-	 			 theta0 = NULL, corEst2 = NULL, ind12 = NULL, S = NULL, notOnlyLambda2 = TRUE)	
-{
-
+	 			 theta0 = NULL, corEst2 = NULL, ind12 = NULL, S = NULL, notOnlyLambda2 = TRUE, 
+	 			 burn = 0, lambda1B = NULL, lambda2B = NULL)		
+{	
+	
 	theta         <- theta0 
     if(temporalFolders){
      save(D1,D2,file="d1d2temp.Rdata")
      save(ind12,file="ind12temp.Rdata")
      save(corEst2,file="corEst2temp.Rdata")
      save(S,file = "stemp.Rdata")
-     rm(D1,D2, S, theta0, corEst2, ind12);gc();
+     rm(D1,D2, S, theta0, corEst2, ind12);
     }
 	W			  <- list()
 	    
@@ -173,13 +172,52 @@ wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE
  			 save(theta, file= "thetatemp.Rdata")
  			 save(W, file= "wtemp.Rdata")
  			 save(theta.prev, file= "thetaPtemp.Rdata")
-			 rm(theta, W, theta.prev); gc();
+			 rm(theta, W, theta.prev);
 			 load("ind12temp.Rdata")
 			 load("corEst2temp.Rdata")
 	}
+	
+	if(lambda2>0&automLambdas){
+	    sq1  <- seq(-8,8,length.out=10000)
+		alpha2 <- lambda2
+		thetaseq <- seq(-0.3,0.99,length.out=1000)
+		fas <- apply(as.matrix(thetaseq),1,function(theta){
+         x2 <- sort(abs(sq1-qnorm(1-alpha2/2)*sqrt(2-2*theta)/2),index.return=TRUE)
+		 x2$x[which(cumsum( (dnorm(sq1)*diff(sq1)[1] * pnorm((sq1*(1-theta) -qnorm(1-alpha2/2)*sqrt(2-2*theta))/sqrt(1-theta^2))/(alpha2/2))[x2$ix])>1-lambda1)[1]]
+        })
+		iddd 		<- pmax(1,round(punif(corEst2,-0.3,0.99)*1000))
+		alpha1A 	<- matrix(fas[iddd],ncol=dim(corEst2)[1]) 
+		
+		thetaSeq2 <- sample(1:length(corEst2),1000)
+ 		fas2 <- apply(as.matrix(thetaSeq2),1,function(j){
+ 			theta <- corEst2[j]
+ 			lam1  <- alpha1A[j]
+			sq1  <- seq(lam1 + qnorm(1-alpha2/2)*sqrt(2-2*theta)/2,10,length.out=10000)
+			da1  <- dnorm(sq1) 
+			da2  <- da1 * (pnorm((sq1*(1-theta) -qnorm(1-alpha2/2)*sqrt(2-2*theta))/sqrt(1-theta^2))-
+                pnorm(( lam1 -qnorm(1-alpha2/2)*sqrt(2-2*theta)/2 -sq1*theta )/sqrt(1-theta^2)))
+			Interseccio <- 2*(prob1  <- sum(da2*diff(sq1)[1])/(alpha2/2))
+		})
+		Inter 	<- mean(fas2)
+		alpha2T <- (2*lambda1 -Inter)*alpha2
+	}
+	else{
+		alpha1A <- lambda1
+		alpha2T <- 0	
+	}
+	
+	automLambdase 	<- automLambdas
+	lambda1e 		<- lambda1
+	lambda2e 		<- lambda2
+	if(burn>0){
+	 automLambdas <- FALSE
+	 lambda1 	  <- lambda1B
+	 lambda2 	  <- lambda2B
+	} 	
 	Z             <- flsaFast(A, rho, lambda1, lambda2, corsOmega = corEst2, P=P, 
 							 ind12, nsubset = nsubset, automLambdas = automLambdas, sigmaEstimate = sigmaEstimate,
-							 temporalFolders = temporalFolders, notOnlyLambda2 = notOnlyLambda2)	
+							 temporalFolders = temporalFolders, notOnlyLambda2 = notOnlyLambda2, alpha1A = alpha1A,
+							 isnet = TRUE)
     if(temporalFolders){
 				save(Z,file="ztemp.Rdata"); 
 				load("thetatemp.Rdata")
@@ -193,7 +231,7 @@ wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE
 	if(temporalFolders){
 		save(W, file="wtemp.Rdata"); 
 		load("thetaPtemp.Rdata");
-		rm(Z, W); gc()
+		rm(Z, W); 
 	}
 		
 	## Convergence check
@@ -218,7 +256,7 @@ wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE
 		theta.prev  <- theta
 		if(temporalFolders){
 			save(theta.prev, file = "thetaPtemp.Rdata"); 
-			rm(theta.prev);gc()
+			rm(theta.prev);
 		 }
 	
 		## Maximisation step
@@ -233,15 +271,14 @@ wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE
 		   rm(S,Z,W);gc()
 		  }
 		  edecomp     <- eigen(aux)
-		  rm(aux);gc()
+		  rm(aux);
 		  D           <- edecomp$values
 		  V           <- edecomp$vectors
-		  rm(edecomp);gc()
+		  rm(edecomp);
 		  DK          <- n[k]/(2 * rho) * (-D + sqrt(D^2 + 4 * rho/n[k]))
 		  AA          <- t(apply(V,1,function(x) x*DK))
 		  theta[[k]]  <- AA %*% t(V)
 		  rm(V); rm(DK); rm(AA)
-		  gc()
 		}
 		if(temporalFolders){
 			save(theta, file = "thetatemp.Rdata"); 
@@ -263,16 +300,20 @@ wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE
 			load("corEst2temp.Rdata")
 			
 		 }
-		 Z      <- flsaFast(A, rho, lambda1, lambda2, corsOmega = corEst2, P=P, 
+		if(iter>burn){
+		 automLambdas <- automLambdase
+	     lambda1 	  <- lambda1e
+	 	 lambda2 	  <- lambda2e
+		} 
+	    Z             <- flsaFast(A, rho, lambda1, lambda2, corsOmega = corEst2, P=P, 
 							 ind12, nsubset = nsubset, automLambdas = automLambdas, sigmaEstimate = sigmaEstimate,
-							 temporalFolders = temporalFolders, notOnlyLambda2 = notOnlyLambda2)	
+							 temporalFolders = temporalFolders, notOnlyLambda2 = notOnlyLambda2, alpha1A=alpha1A,isnet=TRUE)	
 		 if(temporalFolders){
 				rm(corEst2, ind12); gc()
 				save(Z,file="ztemp.Rdata"); 
 				load("thetatemp.Rdata")
 				load("Wtemp.Rdata")
 		 }
-
 			## Updating step
 			for (k in 1:K) {
 				W[[k]]    <- W[[k]] + (theta[[k]] - Z[[k]])
@@ -346,62 +387,11 @@ wfglaux <- function(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE
 	obj$pairedEst  		<- pairedEst
 	obj$lambda1  		<- lambda1
 	obj$lambda2  		<- lambda2
-
+	obj$alpha2T  		<- alpha2T
+	obj$alpha1A  		<- alpha1A
+	
 	return(obj)
 
 }
 
 
-findingLambda2 <- function(n, lam1, lam2, tol, maxiter=100)
-{
-a1 <- rnorm(n,0,1)
-a2 <- rnorm(n,0,1)
-thr1    <- 1-lam2
-thrm    <- 0.5
-thrM    <- 1
-ite <- 1
-NOTYET  <- TRUE
- while(NOTYET|ite>maxiter){
-		thr <- quantile(abs(a1-a2),thr1) 
-        S1      <-  abs(a1-a2) <= thr
-        S2      <-  (a1-a2) >  thr
-        S3      <- -(a1-a2) >  thr
-     	X1      <- (a1+a2)/2
-        Y1      <- (a1+a2)/2
-        X2      <- a1 - thr/2
-        Y2      <- a2 + thr/2
-        X3      <- a1 + thr/2
-        Y3      <- a2 - thr/2
-        a11      <- (S1 * X1 + S2 * X2 + S3 * X3)
-        a22      <- (S1 * Y1 + S2 * Y2 + S3 * Y3)
-        th2 <- quantile(c(a11,a22),1-lam1)
-	    X1      <- a11 - th2
-        X2      <- a11 + th2
-	    Y1      <- a22 - th2
-        Y2      <- a22 + th2
-        S11      <- a11 > th2
-        S12      <- a11 < -th2
-        S21      <- a22 > th2
-        S22      <- a22 < -th2
-        X = S11*X1 + S12*X2
-        Y = S21*Y1 + S22*Y2        
-        (diffr <- mean(X-Y!=0)/mean(X!=0|Y!=0) - lam2 )
-        if(abs(diffr) <tol) NOTYET <- FALSE
-        else{
-        if(diffr >0)
-        {
-          thrm <- thr1
-          thr1 <- (thr1 + thrM)/2
-          
-        }
-        if(diffr < 0)
-        {
-          thrM <- thr1
-          thr1 <- (thr1 + thrm)/2
-
-        }
-        }
-        (ite <- ite+1)
-}
-return(1-thr1) 
-}      

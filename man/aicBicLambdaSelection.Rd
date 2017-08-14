@@ -13,7 +13,7 @@
 }
 \usage{
 
-aicAndbicLambdaSelection(obj,  y, criterion = c("AIC", "BIC"))
+aicAndbicLambdaSelection(obj,  y, criterion = c("AIC", "BIC", "eBIC"), phi=1)
 }
 
 \arguments{
@@ -25,21 +25,25 @@ aicAndbicLambdaSelection(obj,  y, criterion = c("AIC", "BIC"))
       original \eqn{n \times p} data set.
 }
 \item{criterion}{
-	coefficients and optimal lambdas to be stored: to select from \code{"AIC"}, \code{"BIC"} or both.
+	coefficients and optimal lambdas to be stored: to select from \code{"AIC"}, \code{"BIC"} or \code{"eBIC"}.
 }
-
+\item{phi}{
+	weight used in the eBIC criterion (see reference).
+}
 }
 \value{          
 	An object of class \code{lambdaSelection} containing the following components: 
  
-  \item{opt.lambda }{optimal lambdas for AIC and BIC.} 
-  \item{crit.coef }{coefficients for each lambda given the criterion AIC and BIC.}
+  \item{opt.lambda }{optimal lambdas for AIC, BIC and eBIC.} 
+  \item{crit.coef }{coefficients for each lambda given the criterion AIC, BIC and eBIC.}
   \item{criterion }{with value defined by argument \code{criterion}.}
   
 
 }
 \references{
 Caballe, A., N. Bochkina, and C. Mayer (2016). Selection of the Regularization Parameter in Graphical Models using network charactaristics. eprint arXiv:1509.05326, 1-25. 
+
+Chen, J. and Z. Chen (2008). Extended Bayesian information criteria for model selection with large model spaces. Biometrika 95(3), 759-771. 
 }
 \author{
  Caballe, Adria <a.caballe@sms.ed.ac.uk>, Natalia Bochkina and Claus Mayer.

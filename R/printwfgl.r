@@ -26,6 +26,7 @@ print.wfgl <- function(x, ...){
 	   cat(gettextf("Estimated common edges = %s, \t Sparsity estimated common network = %s", edC/2, round(spC,5) ), "\n\n")  
 	   cat(gettextf("Estimated differential edges = %s, \t Sparsity estimated differential network = %s", edD/2, round(spD,5) ), "\n\n")  
 	   cat(gettextf("Estimated edges for only pop.1 = %s, \t Estimated edges for only pop.2 = %s", edD1/2, edD2/2 ), "\n\n")  
+	   if(x$paired&x$automLambdas) cat(gettextf("alpha2 = %s", round(x$alpha2,5)), "\n\n")  
   }
   else{	   
        P	<- dim(x$path[[1]][[1]])[1]
@@ -46,7 +47,6 @@ print.wfgl <- function(x, ...){
 	   min(edD/2), max(edD/2), round(min(spD),5),round(max(spD),5) ), "\n\n") 
 	   cat(gettextf("Estimated edges for only pop.1 : %s -> %s, \t Estimated edges for only pop.2 : %s -> %s", 
 		 min(edD1/2), max(edD1/2), round(min(edD2),5),round(max(edD2),5) ), "\n\n") 
-
 
   }
  

@@ -31,7 +31,6 @@
 \alias{squareWeight}
 \alias{wfglaux}
 \alias{wfrlaux}
-\alias{findingLambda2}
 
 \title{Internal  functions}
 \description{Internal  functions}
@@ -66,28 +65,30 @@ ztransfCorrDiffsub(D1, D2, row, thetaKnown = NULL,  diagCor )
 meanCors(mat, scaleT = TRUE, sampleFrom = FALSE, nitSamp = 1000)
 controlseqCorTestByRows(D1, D2, testStatistic, nite, paired, conf.level)
 controlwfgl(D1, D2, lambda1, lambda2, paired, automLambdas, 
-	 		sigmaEstimate, pairedEst, maxiter, tol, nsubset, weights,
-	 		rho, rho.increment, triangleCorrection, alphaTri, temporalFolders)
+  sigmaEstimate, pairedEst, maxiter, tol, nsubset, weights,
+  rho, rho.increment, triangleCorrection, alphaTri, temporalFolders, burn)
 controlwfrl(D1, D2, lambda1, lambda2, paired, automLambdas, sigmaEstimate, 
             maxiter, tol, nsubset, rho, rho.increment, notOnlyLambda2)
 flsaFast(A, L, lam1, lam2, corsOmega = NULL, P, ind12, 
         nsubset = 10000, automLambdas = TRUE, penalize.diagonal = FALSE, 
-        sigmaEstimate = "CRmad", temporalFolders, notOnlyLambda2 = TRUE)
+        sigmaEstimate = "CRmad", temporalFolders, notOnlyLambda2 = TRUE,
+        isnet = TRUE, alpha1A = NULL)
 pcor2jointGraph(M1, M2, minn=0, col=c("blue","red","green"), vertex.size=2, 
   C1=NULL,C2=NULL, edgesThicknees=FALSE, zoomThick = 10, ...)
 degrees(A)
 squareWeight(at, th, weight1)
 wfglaux(D1, D2, lambda1, lambda2, paired = TRUE, automLambdas = TRUE, 
-sigmaEstimate = "CRmad", pairedEst = "Reg-based-sim", maxiter = 30, 
- tol = 1e-05, nsubset = 10000, weights = c(1,1), rho = 1, rho.increment = 1, 
- triangleCorrection = TRUE, alphaTri = 0.01, temporalFolders = FALSE, 
- theta0 = NULL, corEst2 = NULL, ind12 = NULL, S = NULL, notOnlyLambda2 = TRUE)	
+        sigmaEstimate = "CRmad", pairedEst = "Reg-based-sim", maxiter = 30, 
+        tol = 1e-05, nsubset = 10000, weights = c(1,1), rho = 1, rho.increment = 1, 
+        triangleCorrection = TRUE, alphaTri = 0.01, temporalFolders = FALSE, 
+        theta0 = NULL, corEst2 = NULL, ind12 = NULL, S = NULL, notOnlyLambda2 = TRUE, 
+        burn = 0, lambda1B = NULL, lambda2B = NULL)		
 wfrlaux(D1, D2, lambda1, lambda2, automLambdas=FALSE, paired = FALSE, 
   sigmaEstimate = "CRmad", maxiter = 30, tol=1e-05, nsubset = 10000,  
   rho = 1, rho.increment = 1, notOnlyLambda2 = TRUE, corsOmega = NULL, 
   thetae0 = NULL, theta = NULL, C12 = NULL, ind12 = NULL)
-findingLambda2(n, lam1, lam2, tol, maxiter=100)
-
+saddlePointFunction(Exc, NeR, N, u, ttmin=-1.45, ttmax=.4999, lengthTT=5000, kmin=0, 
+   kmax=100, excAdj = FALSE)
 
 
 }

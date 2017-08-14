@@ -18,6 +18,7 @@ export(vulLambdaSelection)
 export(aicAndbicLambdaSelection)
 export(amseLambdaSelection)
 export(pcLambdaSelection)
+export(thesholdSelection)
 
 S3method(plot, pcorSim)
 S3method(plot, pcorSimJoint)
@@ -55,13 +56,18 @@ importFrom(VGAM, zeta)
 importFrom(cluster, agnes)
 importFrom(RBGL, johnson.all.pairs.sp)
 importFrom(camel, camel.tiger)
+importFrom(qvalue, pi0est)
 
 importFrom("grDevices", "devAskNewPage")
 importFrom("graphics", "abline", "lines", "par", "plot", "points")
-importFrom("stats", "as.dist", "cor", "cov", "cov2cor", "lm", "pgamma",
-             "pnorm", "qgamma", "qnorm", "quantile", "rbeta", "rbinom",
-             "rmultinom", "rnorm", "runif", "sd", "var")
 importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+importFrom("stats", "as.dist", "cor", "cov", "cov2cor", "dbinom",
+             "dnorm", "lm", "median", "pgamma", "pnorm", "punif",
+             "qgamma", "qnorm", "quantile", "rbeta", "rbinom", "rgamma",
+             "rmultinom", "rnorm", "runif", "sd", "var")
+             
+
+
 
 
 

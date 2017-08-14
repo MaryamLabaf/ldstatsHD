@@ -20,8 +20,8 @@
 }
 \usage{
 
-lambdaSelection(obj, criterion = c("PC","AGNES","A-MSE","VUL","STARS", "AIC", "BIC"), 
-                ...)
+lambdaSelection(obj, criterion = c("PC","AGNES",
+  "A-MSE","VUL","STARS", "AIC", "BIC", "eBIC"), ...)
 
 }
 
@@ -33,7 +33,7 @@ lambdaSelection(obj, criterion = c("PC","AGNES","A-MSE","VUL","STARS", "AIC", "B
  \item{criterion}{
   regularization parameter selection approach: name that uniquely identifies \code{"PC"} (Path connectivity), 
 \code{"AGNES"} (AGlommerative NESted Algorithm), \code{"A-MSE"} (Augmented mean square error), 
-\code{"VUL"} (Maximum VULnerability), \code{"AIC"}/\code{"BIC"} (minimum AIC/BIC) or \code{"StARS"} (Stability approach).
+\code{"VUL"} (Maximum VULnerability), \code{"AIC"}/\code{"BIC"}/\code{"eBIC"} (minimum AIC/BIC/eBIC) or \code{"StARS"} (Stability approach).
 }
 
   \item{\dots}{

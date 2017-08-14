@@ -31,7 +31,7 @@ controlwfrl <- function(D1, D2, lambda1, lambda2, paired, automLambdas,
     stop("lambda2 is not well defined for automLambda = FALSE. It must be larger or equal to zero")  
   if( any(lambda1 < 0 | lambda1 > 0.5 ) & automLambdas &notOnlyLambda2)
     stop("lambda1 is not well defined for automLambda = TRUE. It must be between 0 and 0.5")
-  if( (lambda2 < 0 | lambda2 > 0.5 ) & automLambdas)
+  if( (lambda2 < 0 | lambda2 > 1 ) & automLambdas)
     stop("lambda2 is not well defined for automLambda = TRUE. It must be between 0 and 0.5")    	
   
   ## prospective sigmaEstimate

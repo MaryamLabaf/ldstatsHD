@@ -27,6 +27,8 @@ print.wfrl <- function(x, ...){
 	   cat(gettextf("Estimated common edges = %s, \t Sparsity estimated common network = %s", edC, round(spC,5) ), "\n\n")  
 	   cat(gettextf("Estimated differential edges = %s, \t Sparsity estimated differential network = %s", edD, round(spD,5) ), "\n\n")  
 	   cat(gettextf("Estimated edges for only pop.1 = %s, \t Estimated edges for only pop.2 = %s", edD1, edD2 ), "\n\n")  
+	   if(x$paired&x$automLambdas) cat(gettextf("alpha2 = %s", round(x$alpha2,5)), "\n\n")  
+
   }
   else{	   
        P	<- dim(x$path[[1]][[1]])[1]

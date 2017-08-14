@@ -9,3 +9,4 @@ covCrosCor <- function(rhojk, rhohm, rhokh, rhokm, rhojh, rhojm)
           (rhojm - rhojk*rhokm)*(rhokh - rhokm*rhomh))
         return(AU)
 }
+

@@ -7,6 +7,7 @@ findTriangles <- function(A1){
       if(dim(AR)[1]>0){
        if(dim(AR)[1]>1000) print("many triangles are found. Computations can take time \n")
        for(i in 1:dim(AR)[1]){
+         print(i)
          da <- as.numeric(names(which(table(c(which(A1[AR[i,1],]!=0),which(A1[AR[i,2],]!=0)))==2)))
          la <- length(da)
          if(la>1)

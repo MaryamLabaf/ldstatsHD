@@ -42,15 +42,17 @@ summary.eqCorrMatTest <- function(object, ...){
   cat("\n")
  }
  if(any(x$testStatistic == "exc")){
+  for(i in 1:length(x$EXC$threshold)){
    if(any(x$testNullDist == "asyIndep"))
-    cat(gettextf("asyIndep \t Texc = %s, \t pval =  %s, \t %s percent CI: %s %s ",  
-    	round(x$EXC$ai$testExc,dec), round(x$EXC$ai$pvalue,dec), round(x$conf.level * 100), round(x$EXC$ai$ci[1],dec) , round(x$EXC$ad$ci[2],dec)  ), "\n")
+    cat(gettextf("asyIndep \t thr = %s, \t Texc = %s, \t pval =  %s, \t %s percent CI: %s %s ",  
+    	round(x$EXC$threshold[i],dec),round(x$EXC$ai$testExc[i],dec), round(x$EXC$ai$pvalue[i],dec), round(x$conf.level * 100), round(x$EXC$ai$ci[i,1],dec) , round(x$EXC$ai$ci[i,2],dec)  ), "\n")
    if(any(x$testNullDist == "asyDep"))
-    cat(gettextf("asyDep \t\t Texc = %s, \t pval =  %s, \t %s percent CI: %s %s ",  
-    	round(x$EXC$ad$testExc,dec), round(x$EXC$ad$pvalue,dec), round(x$conf.level * 100), round(x$EXC$ad$ci[1],dec) , round(x$EXC$ad$ci[2],dec)  ), "\n")
+    cat(gettextf("asyDep \t\t thr = %s,  \t Texc = %s, \t pval =  %s, \t %s percent CI: %s %s ",  
+    	round(x$EXC$threshold[i],dec), round(x$EXC$ad$testExc[i],dec), round(x$EXC$ad$pvalue[i],dec), round(x$conf.level * 100), round(x$EXC$ad$ci[i,1],dec) , round(x$EXC$ad$ci[i,2],dec)  ), "\n")
    if(any(x$testNullDist == "np"))
-    cat(gettextf("np \t\t\t Texc = %s, \t pval =  %s, \t %s percent CI: %s %s ",  
-    	round(x$EXC$np$testExc,dec), round(x$EXC$np$pvalue,dec), round(x$conf.level * 100), round(x$EXC$np$ci[1],dec) , round(x$EXC$np$ci[2],dec)  ), "\n")
+    cat(gettextf("np \t\t\t thr = %s, \t Texc = %s, \t pval =  %s, \t %s percent CI: %s %s ",  
+    	round(x$EXC$threshold[i],dec), round(x$EXC$np$testExc[i],dec), round(x$EXC$np$pvalue[i],dec), round(x$conf.level * 100), round(x$EXC$np$ci[i,1],dec) , round(x$EXC$np$ci[i,2],dec)  ), "\n")
+  }
   cat("\n")
  }
  

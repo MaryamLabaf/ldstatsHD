@@ -2,7 +2,8 @@
 equalCorrelationMatrices.test <- function(D1, D2, testStatistic = c("AS", "max", "exc"), 
                      					 testNullDist = c("asyIndep","asyDep", "np"), nite= 500, 
                      					 paired = FALSE, threshold = 2.3, exact=FALSE, excAdj = TRUE,
-                     					 conf.level = 0.95, norm.approx = FALSE, ...)
+                     					 conf.level = 0.95, norm.approx = FALSE, saddlePoint = FALSE,
+                     					 MINint = 2, MAXint = 100,...)
 {
   ## Data scaling
   D1    <- scale(D1)
@@ -65,10 +66,12 @@ equalCorrelationMatrices.test <- function(D1, D2, testStatistic = c("AS", "max",
       obj$MAX$ad  <- equalCorrelationsTestMax(Test = Test, theta = theta, TestsP = TestsP, dependency = TRUE, N = N, P = P, 
                         					  nite = nite, psiAdj = FALSE, thetaKnown = thetaKnown, conf.level = conf.level)
     if(any(testStatistic == "exc"))
+    {
      obj$EXC$ad  <- equalCorrelationsTestExc(Test = Test, theta = theta, TestsP = TestsP, dependency = TRUE, EX = threshold, 
 										     conf.level = conf.level, excAdj = excAdj)
+     obj$EXC$threshold <- threshold
+    }
    }
-   
    if(any(testNullDist == "asyIndep"))
    {
     if(any(testStatistic=="AS"))
@@ -78,20 +81,26 @@ equalCorrelationMatrices.test <- function(D1, D2, testStatistic = c("AS", "max",
       obj$MAX$ai  <- equalCorrelationsTestMax(Test = Test, theta = NULL, TestsP = NULL, dependency = FALSE, N = N, P = P, 
                         					  nite = 0, psiAdj = FALSE, thetaKnown = 0, conf.level = conf.level) 
     if(any(testStatistic == "exc"))
+    {
       obj$EXC$ai  <- equalCorrelationsTestExc(Test = Test, theta = NULL, TestsP = NULL, dependency = FALSE, EX = threshold, 
-      									      conf.level = conf.level, excAdj = excAdj, nite = nite)
+      									      conf.level = conf.level, excAdj = excAdj, nite = nite, saddlePoint =saddlePoint,
+      									      MINint = MINint, MAXint = MAXint)
+     obj$EXC$threshold <- threshold
+    }       									      
    } 
    
    if(any(testNullDist=="np"))
    {
      resAUX  <- equalCorrelationsTestPerm(Test = Test, theta = theta, TestsP = TestsP, sumSquares = TRUE, dependency = TRUE, 
-      									  conf.level = conf.level, excAdj = excAdj)
+      									  conf.level = conf.level, excAdj = excAdj, EX = threshold)
      
      if(any(testStatistic=="AS"))    obj$AS$np 	<- resAUX$AS
      if(any(testStatistic=="max"))   obj$MAX$np <- resAUX$MAX      
-     if(any(testStatistic=="exc"))   obj$EXC$np <- resAUX$EXC      
-   }
-   
+     if(any(testStatistic=="exc")){
+        obj$EXC$np 			<- resAUX$EXC      
+        obj$EXC$threshold 	<- threshold
+     }
+  } 
   return(obj)
 }
 
